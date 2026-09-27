@@ -1,7 +1,26 @@
 import asyncio
+import os
 from pyrogram import Client, filters
 from pytgcalls import PyTgCalls
 from pytgcalls.types import AudioVideoPiped
+from flask import Flask
+from threading import Thread
+
+# --- ለ Render የፖርት ስህተት መፍትሄ (Fake Port) ---
+flask_app = Flask('')
+
+@flask_app.route('/')
+def home():
+    return "Abeba Music Bot is Alive!"
+
+def run_flask():
+    flask_app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
+
+def keep_alive():
+    t = Thread(target=run_flask)
+    t.daemon = True
+    t.start()
+# --------------------------------------------------
 
 API_ID = 33978718
 API_HASH = "8094189df3adfa120e2be95fc0db01db"
@@ -37,6 +56,7 @@ async def stop_music(client, message):
         await message.reply_text(f"ስህተት: {e}")
 
 async def main():
+    keep_alive() # የውሸት ፖርቱን እዚህ ጋር ይቀሰቅሰዋል
     await app.start()
     await call_app.start()
     print("🚀 ቦቱ በተሳካ ሁኔታ ሥራ ጀምሯል!")
